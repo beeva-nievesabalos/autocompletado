@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+      <script src="./js/typeahead.bundle.js"></script>
+      <style>
+        .container {
+          width: 800px;
+          margin: 50px auto;
+        }
+
+        .typeahead-wrapper {
+          display: block;
+          margin: 50px 0;
+        }
+
+        .tt-dropdown-menu {
+          background-color: #fff;
+          border: 1px solid #000;
+        }
+
+        .tt-suggestion.tt-cursor {
+          background-color: #ccc;
+        }
+
+        .triggered-events {
+          float: right;
+          width: 500px;
+          height: 300px;
+        }
+ 
+      </style>
+  </head>   
+  <body>
+    <div class="container">
+      <div id="prefetch">
+        <input class="typeahead" type="text" placeholder="Localiza activos por provincia, localidad o código SAREB">
+      </div>
+    </div>
+      <script>
+      var activos = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        limit: 10,
+        prefetch: {
+          // url points to a json file that contains an array of activos names, see
+          // https://github.com/twitter/typeahead.js/blob/gh-pages/data/countries.json
+          //url: 'http://54.195.222.159:2103/create/diccionario',
+          url: 'http://54.195.222.159:2103/download/minidiccionario',
+          // the json file contains an array of strings, but the Bloodhound
+          // suggestion engine expects JavaScript objects so this converts all of
+          // those strings
+          filter: function(list) {
+            return $.map(list, function(activos) { return { name: activos }; });
+          }
+        }
+      });
+       
+      // kicks off the loading/processing of `local` and `prefetch`
+      activos.initialize();
+       
+      // passing in `null` for the `options` arguments will result in the default
+      // options being used
+
+
+      $('#prefetch .typeahead').typeahead({highlight: true}, {
+        name: 'activos',
+        displayKey: 'name',
+        // `ttAdapter` wraps the suggestion engine in an adapter that
+        // is compatible with the typeahead jQuery plugin
+        source: activos.ttAdapter(),
+      });
+
+      </script>
+  </body>
+</html>
